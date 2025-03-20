@@ -1,0 +1,46 @@
+# Byte-compiled / binary files
+__pycache__/
+*.py[cod]
+*.so
+*.swp
+
+# Virtual environment
+.venv/
+.env/
+
+# Database files
+*.sqlite3
+*.db
+.env
+
+# Secrets and configuration files
+config.py
+*.ini
+*.env
+
+# Log files
+logs/
+*.log
+
+# VSCode settings
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Compiled distribution files
+dist/
+build/
+*.egg-info/
+
+# MySQL Workbench files
+*.bak
+*.sql
+*.dump
+
+# Ignore database files
+*.sqlite3
+
+# Ignore any Python cache or compiled code
+*.pyo
