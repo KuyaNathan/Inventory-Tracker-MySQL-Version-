@@ -1,6 +1,7 @@
-import MySQLdb
 import os
 from dotenv import load_dotenv
+import bcrypt
+import MySQLdb
 
 load_dotenv("db_config.env")
 
@@ -28,12 +29,28 @@ class SQL_Connection():
 
 		# creates the tables if they do not already exist
 
+		
+		# users table for logging in
+		self.cursor.execute(
+			"""
+				CREATE TABLE IF NOT EXISTS `users`(
+					`user_id` INT NOT NULL AUTO_INCREMENT,
+					`username` varchar(255) UNIQUE NOT NULL,
+					`password_hash` varchar(255) NOT NULL,
+					PRIMARY KEY (`user_id`)
+				)
+			"""
+		)
+
 		self.cursor.execute(
 			"""
 				CREATE TABLE IF NOT EXISTS `companies`(
 					`company_id` INT NOT NULL AUTO_INCREMENT,
 					`name` varchar(255) UNIQUE NOT NULL,
-					PRIMARY KEY (`company_id`)
+					`user_id` INT NOT NULL,
+					PRIMARY KEY (`company_id`),
+					KEY `FK_user_id` (`user_id`),
+					CONSTRAINT `FK_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
 				)
 			"""
 		)
@@ -66,35 +83,7 @@ class SQL_Connection():
 			"""
 		)
 
-		# users table for logging in
-		'''
-		self.cursor.execute(
-			"""
-				CREATE TABLE IF NOT EXISTS `users`(
-					`user_id` INT NOT NULL AUTO_INCREMENT,
-					`username` varchar(255) UNIQUE NOT NULL,
-					`password_hash` varchar(255) NOT NULL,
-					`company_id` INT NOT NULL,
-					PRIMARY KEY (`user_id`),
-					KEY `FK_company_id` (`company_id`),
-					CONSTRAINT `FK_company_id` FOREIGN KEY (`company_id`) REFERENCES `companies` (`company_id`)
-				)
-			"""
-		)
-		'''
-
 		self.connection.commit()
-		
-	def authenticate_user(self, username, password):
-		query = "SELECT user_id, password_hash, company_id FROM users WHERE username = %s"
-		result = self.fetch_query(query, (username,))
-
-		if result:
-			user_id, password_hash, company_id = result[0]
-			if bcrypt.checkpw(password.encode(), password_hash.encode()):
-				return {"user_id": user_id, "company_id": company_id}
-		return None
-
 	
 	def execute_query(self, query, parameters = None):
 		try:
